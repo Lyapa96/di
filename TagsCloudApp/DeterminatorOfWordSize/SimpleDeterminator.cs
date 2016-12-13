@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -13,9 +14,9 @@ namespace TagsCloudApp.DeterminatorOfWordSize
         private readonly double averageFrequency;
 
 
-        public SimpleDeterminator(Dictionary<string, int> wordToFrequency)
+        public SimpleDeterminator(Lazy<Dictionary<string, int>> wordToFrequency)
         {
-            averageFrequency = wordToFrequency.Select(w => w.Value).Average();
+            averageFrequency = wordToFrequency.Value.Select(w => w.Value).Average();
         }
 
         public SimpleDeterminator()
@@ -23,13 +24,13 @@ namespace TagsCloudApp.DeterminatorOfWordSize
             averageFrequency = 5;
         }
 
-        public Size GetSize(WordInformation word)
+        public Font GetSize(WordInformation word, string fontname)
         {
             if (word.Frequency > averageFrequency)
-                return new Size(word.Content.Length*BigSize, BigSize);
+                return new Font(fontname, BigSize);
             if (word.Frequency < 0.4*averageFrequency)
-                return new Size(word.Content.Length*SmallSize, SmallSize);
-            return new Size(word.Content.Length*MediumSize, MediumSize);
+                return new Font(fontname, SmallSize);
+            return new Font(fontname, MediumSize);
         }
     }
 }

@@ -14,6 +14,9 @@ namespace TagsCloudApp.CloudLayouter.CircularCloudLayouter
         public List<Rectangle> Rectangles { get; set; }
         public Spiral Spiral;
 
+        private readonly double densityOfSpiral = 0.001;
+        private readonly double deltaOfSpiralInDegrees = 10;
+
         public CircularCloudLayouter(Point center, int width, int height, double densityOfSpiral = 0.001,
             double deltaOfSpiralInDegrees = 10)
         {
@@ -64,6 +67,12 @@ namespace TagsCloudApp.CloudLayouter.CircularCloudLayouter
                 }
             }
             return true;
+        }
+
+        public void RemovePlacedRectangles()
+        {
+            Rectangles = new List<Rectangle>();
+            Spiral = new Spiral(CenterPoint, Width, Height, densityOfSpiral, deltaOfSpiralInDegrees);
         }
 
         private bool IsPossiblePutRectangle(Rectangle currentRectangle)

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace TagsCloudApp
+namespace TagsCloudApp.Preprocessors
 {
     public class OrdinaryPreprocessor : IPreprocessorWords
     {

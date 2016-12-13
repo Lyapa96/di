@@ -2,5 +2,7 @@
 {
     public interface ITagsCloudAppUi
     {
+        void Run();
+        void SaveCloud();
     }
 }

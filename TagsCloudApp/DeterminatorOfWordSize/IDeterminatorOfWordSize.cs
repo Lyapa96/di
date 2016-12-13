@@ -4,6 +4,6 @@ namespace TagsCloudApp.DeterminatorOfWordSize
 {
     public interface IDeterminatorOfWordSize
     {
-        Size GetSize(WordInformation word);
+        Font GetSize(WordInformation word, string fontname);
     }
 }
