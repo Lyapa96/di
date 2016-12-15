@@ -1,9 +1,11 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace TagsCloudApp.DeterminatorOfWordSize
 {
     public interface IDeterminatorOfWordSize
     {
-        Font GetSize(WordInformation word, string fontname);
+        Font GetFont(WordInformation word, string fontname);
+        void SetParameters(Dictionary<string, int> wordStats);
     }
 }

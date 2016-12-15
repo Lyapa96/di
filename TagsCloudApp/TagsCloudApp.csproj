@@ -64,11 +64,13 @@
     <Compile Include="CloudLayouter\CircularCloudLayouter\CircularCloudLayouter.cs" />
     <Compile Include="CloudLayouter\CircularCloudLayouter\GeometryHelper.cs" />
     <Compile Include="CloudLayouter\CircularCloudLayouter\Spiral.cs" />
+    <Compile Include="CloudLayouter\CloudLayouterSettings.cs" />
     <Compile Include="DataInput\IFileParser.cs" />
     <Compile Include="Client\TagsCloudAppUi.cs" />
     <Compile Include="DeterminatorOfWordSize\IDeterminatorOfWordSize.cs" />
-    <Compile Include="DeterminatorOfWordSize\SimpleDeterminator.cs" />
+    <Compile Include="DeterminatorOfWordSize\FirstDeterminator.cs" />
     <Compile Include="CloudLayouter\ICloudLayouter.cs" />
+    <Compile Include="DeterminatorOfWordSize\SecondDeterminator.cs" />
     <Compile Include="Preprocessors\IPreprocessorWords.cs" />
     <Compile Include="Preprocessors\OrdinaryPreprocessor.cs" />
     <Compile Include="Preprocessors\PreprocessorWordsInInitialForm.cs" />

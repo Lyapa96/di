@@ -7,6 +7,10 @@ namespace TagsCloudApp
 {
     public class TagsCloudSettings
     {
+        public delegate TagsCloudSettings Factory(
+            int width, int height, string imageFormat, string fontname, Color backgroundColor, IEnumerable<Color> colors,
+            Func<WordInformation, Color> algorithmOfColoringWords);
+
         public int Width { get; set; }
         public int Height { get; set; }
         public string ImageFormat { get; set; }
@@ -20,10 +24,22 @@ namespace TagsCloudApp
             SetDefaultSettings();
         }
 
+        public TagsCloudSettings(int width, int height, string imageFormat, string fontname, Color backgroundColor,
+            IEnumerable<Color> colors, Func<WordInformation, Color> algorithmOfColoringWords)
+        {
+            Width = width;
+            Height = height;
+            ImageFormat = imageFormat;
+            Fontname = fontname;
+            BackgroundColor = backgroundColor;
+            Colors = colors;
+            AlgorithmOfColoringWords = algorithmOfColoringWords;
+        }
+
         private void SetDefaultSettings()
         {
-            Width = 500;
-            Height = 500;
+            Width = 1000;
+            Height = 1000;
             ImageFormat = ".png";
             Fontname = "Arial";
             BackgroundColor = Color.White;

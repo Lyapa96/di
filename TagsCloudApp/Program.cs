@@ -1,7 +1,8 @@
-﻿using System.Drawing;
-using System.IO;
-using System.Reflection;
+﻿using System;
 using Autofac;
+using TagsCloudApp.Client;
+using TagsCloudApp.Client.ConsoleClient;
+using TagsCloudApp.CloudLayouter;
 using TagsCloudApp.CloudLayouter.CircularCloudLayouter;
 using TagsCloudApp.DataInput;
 using TagsCloudApp.DeterminatorOfWordSize;
@@ -11,32 +12,81 @@ namespace TagsCloudApp
 {
     class Program
     {
+        public static IContainer Container;
+
         static void Main(string[] args)
         {
+            CreateContainer();
+            Start();
+        }
+
+        private static void Start()
+        {
+            try
+            {
+                Container.Resolve<ITagsCloudAppUi>().Run();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+        }
+
+        private static void CreateContainer()
+        {
             var builder = new ContainerBuilder();
-            builder.RegisterType<TxtParser>().As<IFileParser>();
-            var container = builder.Build();
+            builder.RegisterType<DataSourceParser>().AsSelf();
+            builder.Register<IFileParser>(
+                (c, p) =>
+                {
+                    var extension = p.Named<string>("extension");
+                    if (extension == ".txt")
+                        return new TxtParser();
+                    throw new ArgumentException();
+                });
+            builder.Register<IDeterminatorOfWordSize>(
+                (c, p) =>
+                {
+                    var name = p.Named<string>("name");
+                    if (name == "first")
+                    {
+                        return new FirstDeterminator();
+                    }
+                    if (name == "second")
+                    {
+                        return new SecondDeterminator();
+                    }
+                    throw new ArgumentException();
+                });
+            builder.Register<IPreprocessorWords>(
+                (c, p) =>
+                {
+                    var name = p.Named<string>("name");
+                    if (name == "first")
+                    {
+                        return new OrdinaryPreprocessor();
+                    }
+                    if (name == "second")
+                    {
+                        return new PreprocessorWordsInInitialForm();
+                    }
+                    throw new ArgumentException();
+                });
+            builder.RegisterType<FirstDeterminator>().As<IDeterminatorOfWordSize>();
+            builder.RegisterType<SecondDeterminator>().As<IDeterminatorOfWordSize>();
+            builder.RegisterType<CircularCloudLayouter>().As<ICloudLayouter>();
+            builder.RegisterType<PreprocessorWordsInInitialForm>().As<IPreprocessorWords>();
+            builder.RegisterType<OrdinaryPreprocessor>().As<IPreprocessorWords>();
+            builder.RegisterType<TagsCloudSettings>().AsSelf().UsingConstructor();
+            builder.RegisterType<CloudLayouterSettings>();
 
-            var text = container.Resolve<IFileParser>().GetFileText("1.txt");
+            builder.RegisterType<TagsCloud>()
+                .UsingConstructor(typeof (IPreprocessorWords), typeof (TagsCloudSettings),
+                    typeof (IDeterminatorOfWordSize), typeof (ICloudLayouter));
 
-            var path = Assembly.GetExecutingAssembly().Location;
-            var tagsCloudsApp = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(path)));
+            builder.RegisterType<ConsoleUi>().As<ITagsCloudAppUi>();
 
-            var cloud = new TagsCloud(new OrdinaryPreprocessor(), new TagsCloudSettings(), new SimpleDeterminator(),
-                new CircularCloudLayouter(new Point(250, 250), 500, 500));
-            cloud = cloud.SetSettings(new TagsCloudSettings()
-            {
-                BackgroundColor = Color.Yellow
-            });
-            cloud.CreateBitmapWithWords(text, Path.Combine(tagsCloudsApp, "1.bmp"));
-
-
-            cloud = cloud.SetSettings(new TagsCloudSettings()
-            {
-                BackgroundColor = Color.Azure
-            });
-            cloud = cloud.SetPreprocessor(new PreprocessorWordsInInitialForm());
-            cloud.CreateBitmapWithWords(text, Path.Combine(tagsCloudsApp, "2.bmp"));
+            Container = builder.Build();
         }
     }
 }

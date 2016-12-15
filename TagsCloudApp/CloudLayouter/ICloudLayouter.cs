@@ -6,5 +6,6 @@ namespace TagsCloudApp.CloudLayouter
     {
         Rectangle PutNextRectangle(Size rectangleSize);
         void RemovePlacedRectangles();
+        void SetCloudSetting(CloudLayouterSettings settings);
     }
 }

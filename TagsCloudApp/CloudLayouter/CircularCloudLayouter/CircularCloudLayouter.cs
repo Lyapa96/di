@@ -7,25 +7,22 @@ namespace TagsCloudApp.CloudLayouter.CircularCloudLayouter
 {
     public class CircularCloudLayouter : ICloudLayouter
     {
-        public readonly int Width;
-        public readonly int Height;
-        public readonly Point CenterPoint;
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public Point CenterPoint { get; private set; }
 
         public List<Rectangle> Rectangles { get; set; }
         public Spiral Spiral;
 
-        private readonly double densityOfSpiral = 0.001;
-        private readonly double deltaOfSpiralInDegrees = 10;
+        private readonly double densityOfSpiral;
+        private readonly double deltaOfSpiralInDegrees;
 
-        public CircularCloudLayouter(Point center, int width, int height, double densityOfSpiral = 0.001,
+        public CircularCloudLayouter(double densityOfSpiral = 0.001,
             double deltaOfSpiralInDegrees = 10)
         {
-            Width = width;
-            Height = height;
             Rectangles = new List<Rectangle>();
-            if (GeometryHelper.IsIncorrectPoint(center, width, height)) throw new ArgumentException();
-            CenterPoint = center;
-            Spiral = new Spiral(center, width, height, densityOfSpiral, deltaOfSpiralInDegrees);
+            this.densityOfSpiral = densityOfSpiral;
+            this.deltaOfSpiralInDegrees = deltaOfSpiralInDegrees;
         }
 
         public Rectangle PutNextRectangle(Size rectangleSize)
@@ -73,6 +70,15 @@ namespace TagsCloudApp.CloudLayouter.CircularCloudLayouter
         {
             Rectangles = new List<Rectangle>();
             Spiral = new Spiral(CenterPoint, Width, Height, densityOfSpiral, deltaOfSpiralInDegrees);
+        }
+
+        public void SetCloudSetting(CloudLayouterSettings settings)
+        {
+            Width = settings.Width;
+            Height = settings.Height;
+            if (GeometryHelper.IsIncorrectPoint(settings.CenterPoint, Width, Height)) throw new ArgumentException();
+            CenterPoint = settings.CenterPoint;
+            Spiral = new Spiral(settings.CenterPoint, Width, Height, densityOfSpiral, deltaOfSpiralInDegrees);
         }
 
         private bool IsPossiblePutRectangle(Rectangle currentRectangle)

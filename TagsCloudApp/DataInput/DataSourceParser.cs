@@ -1,27 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
+using Autofac;
+using Autofac.Core;
 
 namespace TagsCloudApp.DataInput
 {
     public class DataSourceParser
     {
-        private readonly Dictionary<string,IFileParser> extensionToParser = new Dictionary<string, IFileParser>()
-        {
-            { "txt",new TxtParser()}
-        };
-
         public IEnumerable<string> GetSourceText(string filename)
         {
-            var extension = GetExtension(filename);
-            var parser = extensionToParser[extension];
-            return parser.GetFileText(filename);
-        }
-
-        private string GetExtension(string filename)
-        {
-            if(!filename.Contains(".")) throw new ArgumentException();
-            var index = filename.LastIndexOf(".", StringComparison.Ordinal);
-            return filename.Substring(index);
+            var extension = Path.GetExtension(filename);
+            var fileParser = Program.Container.Resolve<IFileParser>(new NamedParameter("extension", extension));
+            return fileParser.GetFileText(filename);
         }
     }
 }
