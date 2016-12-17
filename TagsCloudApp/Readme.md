@@ -35,3 +35,23 @@
                 "-a", "random"
             };
 ![2 картинка](https://github.com/Lyapa96/di/blob/master/TagsCloudApp/image.png) 
+
+
+# Третья картинка
+            
+	    args = new[]
+            {
+                "-w", "1000",
+                "-h", "1000",
+                "-r", "500", "500",
+                "-e", ".png",
+                "-t", "2.txt",
+                "-i", "imageWithoutPrepositions",
+                "-f", "Times New Roman",
+                "-b", "black",
+                "-c", "white",
+                "-d", "ordinary",
+                "-p", "initial_form", "without_prepositions",
+                "-a", "similar"
+            };
+![3 картинка](https://github.com/Lyapa96/di/blob/master/TagsCloudApp/imageWithoutPrepositions.png) 
