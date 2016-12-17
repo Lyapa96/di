@@ -4,8 +4,9 @@ namespace TagsCloudApp.CloudLayouter
 {
     public interface ICloudLayouter
     {
-        Rectangle PutNextRectangle(Size rectangleSize);
+        Rectangle LastPlacedRectangle { get; }
+        bool TryPutNextRectangle(Size rectangleSize);
         void RemovePlacedRectangles();
-        void SetCloudSetting(CloudLayouterSettings settings);
+        void SetCloudSetting(int width, int height, Point center);
     }
 }

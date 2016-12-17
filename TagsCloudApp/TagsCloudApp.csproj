@@ -64,7 +64,6 @@
     <Compile Include="CloudLayouter\CircularCloudLayouter\CircularCloudLayouter.cs" />
     <Compile Include="CloudLayouter\CircularCloudLayouter\GeometryHelper.cs" />
     <Compile Include="CloudLayouter\CircularCloudLayouter\Spiral.cs" />
-    <Compile Include="CloudLayouter\CloudLayouterSettings.cs" />
     <Compile Include="DataInput\IFileParser.cs" />
     <Compile Include="Client\TagsCloudAppUi.cs" />
     <Compile Include="DeterminatorOfWordSize\IDeterminatorOfWordSize.cs" />
@@ -76,10 +75,10 @@
     <Compile Include="Preprocessors\PreprocessorWordsInInitialForm.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DataInput\DataSourceParser.cs" />
     <Compile Include="DataInput\TxtParser.cs" />
     <Compile Include="TagsCloud.cs" />
     <Compile Include="TagsCloudSettings.cs" />
+    <Compile Include="TagsCloudSettingsParser.cs" />
     <Compile Include="WordInformation.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Autofac;
 using CommandLine;
@@ -14,69 +15,71 @@ namespace TagsCloudApp.Client.ConsoleClient
 {
     internal class ConsoleUi : ITagsCloudAppUi
     {
-        private readonly Dictionary<string, Action<Options>> commands = new Dictionary<string, Action<Options>>();
+        public delegate ConsoleUi Factory(IEnumerable<string> args);
 
-        private string namePreprocessor { get; set; }
-        private string nameDeterminatorOfWordSize { get; set; }
-        private string inputFilename { get; set; }
-        private string imageName { get; set; }
+        private IEnumerable<string> args { get; set; }
+        private Options options { get; set; }
 
-        public ConsoleUi()
+        public ConsoleUi(IEnumerable<string> args)
         {
-            DefaultSettings();
-            CreateCommands();
-        }
-
-        private void DefaultSettings()
-        {
-            nameDeterminatorOfWordSize = "first";
-            namePreprocessor = "first";
-            inputFilename = "1.txt";
-            imageName = "result.bmp";
+            this.args = args;
         }
 
         public void Run()
         {
-            while (true)
+            options = new Options();
+            var a = args.ToArray();
+
+
+            if (!Parser.Default.ParseArguments(a, options))
             {
-                var line = Console.ReadLine();
-                if (line == null) return;
-                var options = new Options();
-                var args = line.Split(' ');
-                if (Parser.Default.ParseArguments(args, options))
-                {
-                    commands[args[0]](options);
-                };                
+                Console.WriteLine("Arguments given are incorrect");
+                return;
             }
+            SaveCloud();
+        }
+
+        public IEnumerable<string> GetSourceText(string filename)
+        {
+            var extension = Path.GetExtension(filename);
+            var fileParser = Program.Container.Resolve<IFileParser>(new NamedParameter("extension", extension));
+            return fileParser.GetFileText(filename);
         }
 
         public void SaveCloud()
-        {        
-            var settings = Program.Container.Resolve<TagsCloudSettings>();
+        {
+            var settings = GetTagsCloudSettings();
             var layouter = Program.Container.Resolve<ICloudLayouter>();
-            var determinator = Program.Container.Resolve<IDeterminatorOfWordSize>(new NamedParameter("name", nameDeterminatorOfWordSize));
-            var preprocessor = Program.Container.Resolve<IPreprocessorWords>(new NamedParameter("name", namePreprocessor));
-            var cloud = Program.Container.Resolve<TagsCloud.Factory>().Invoke(preprocessor, settings, determinator, layouter);
+            var determinator =
+                Program.Container.Resolve<IDeterminatorOfWordSize>(new NamedParameter("name",
+                    options.nameDeterminatorOfWordSize));
+            var preprocessor =
+                Program.Container.Resolve<IPreprocessorWords>(new NamedParameter("name", options.namePreprocessor));
+            var cloud = Program.Container.Resolve<TagsCloud.Factory>()
+                .Invoke(preprocessor, settings, determinator, layouter);
 
-            var text = Program.Container.Resolve<DataSourceParser>().GetSourceText(inputFilename);
-            
-            cloud.CreateBitmapWithWords(text,GetPathToImg());
+            var text = GetSourceText(options.TextInputFile);
+
+            cloud.CreateBitmapWithWords(text, GetPathToImg());
         }
 
         private string GetPathToImg()
         {
             var path = Assembly.GetExecutingAssembly().Location;
             var tagsCloudsApp = Path.GetDirectoryName(Path.GetDirectoryName(Path.GetDirectoryName(path)));
-            return Path.Combine(tagsCloudsApp, imageName);
+            return Path.Combine(tagsCloudsApp, options.ImageOutputFile + options.ImageFormat);
         }
 
-        private void CreateCommands()
+        private TagsCloudSettings GetTagsCloudSettings()
         {
-            commands.Add("-i",o => imageName = o.ImageOutputFile);
-            commands.Add("-t",o => inputFilename = o.TextInputFile);
-            commands.Add("-d",o => nameDeterminatorOfWordSize = o.nameDeterminatorOfWordSize);
-            commands.Add("-p",o => namePreprocessor = o.namePreprocessor);
-            commands.Add("-s", o => SaveCloud());
+            var backgroudColor = TagsCloudSettingsParser.GetColor(options.BackgroundColor);
+            var colors = TagsCloudSettingsParser.GetColors(options.TextColors).ToArray();
+            var imageFormat = TagsCloudSettingsParser.GetFormat(options.ImageFormat);
+            var center = TagsCloudSettingsParser.GetCenter(options.CenterPoints[0], options.CenterPoints[1]);
+            return Program.Container.Resolve<TagsCloudSettings.Factory>()
+                .Invoke(options.ImageWidth, options.ImageHeight, center, imageFormat, options.Fontname, backgroudColor,
+                    colors,
+                    w => colors.ElementAt(0));
         }
     }
 }

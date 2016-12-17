@@ -5,20 +5,41 @@ namespace TagsCloudApp.Client.ConsoleClient
 {
     internal class Options
     {
-        [Option('t', HelpText = "Введите имя файла с текстом")]
+        [Option('w', "image_width", DefaultValue = 500, HelpText = "Width of resulting image with tags cloud")]
+        public int ImageWidth { get; set; }
+
+        [Option('h', "image_height", DefaultValue = 500, HelpText = "Height of resulting image with tags cloud")]
+        public int ImageHeight { get; set; }
+
+        [OptionArray('r', "center_point", HelpText = "Center of spiral")]
+        public int[] CenterPoints { get; set; }
+
+        [Option('e', DefaultValue = ".bmp", HelpText = "format image")]
+        public string ImageFormat { get; set; }
+
+        [Option('t', "filename", HelpText = "Set source filename", Required = true)]
         public string TextInputFile { get; set; }
 
-        [Option('i', HelpText = "Введите имя картинки создаваемой картинки")]
+        [Option('i', "image_name", HelpText = "Set image name", Required = true)]
         public string ImageOutputFile { get; set; }
 
-        [Option('d', HelpText = "Выберите определитель размера слов first или second")]
+        [Option('f', "font", DefaultValue = "Arial", HelpText = "Font of text in the image")]
+        public string Fontname { get; set; }
+
+        [Option('b', "background_color", DefaultValue = "black",
+            HelpText = "Background color")]
+        public string BackgroundColor { get; set; }
+
+        [OptionArray('c', "text_colors", DefaultValue = null,
+            HelpText = "Сolors of words in the text")]
+        public string[] TextColors { get; set; }
+
+
+        [Option('d', "determinator", HelpText = "Set determinator of wordsize first or second")]
         public string nameDeterminatorOfWordSize { get; set; }
 
-        [Option('p', HelpText = "Выберите предобработчик слов first или second")]
+        [Option('p', "preprocessor", HelpText = "Set preprocessor of wordsize first or second")]
         public string namePreprocessor { get; set; }
-
-        [Option('s', HelpText = "Сохранить файл")]
-        public string Save { get; set; }
 
         [HelpOption]
         public string GetUsage()
