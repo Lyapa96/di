@@ -15,7 +15,7 @@
                 "-p", "initial_form","without_boring_words",
                 "-a", "similar"
             };
-![1 картинка](https://github.com/Lyapa96/di/tree/master/TagsCloudApp/image.bmp) 
+![1 картинка](https://raw.githubusercontent.com/Lyapa96/di/master/TagsCloudApp/image.bmp) 
 
 # Вторая картинка
             
@@ -34,4 +34,4 @@
                 "-p", "initial_form","without_boring_words",
                 "-a", "random"
             };
-![1 картинка](https://github.com/Lyapa96/di/tree/master/TagsCloudApp/image.png) 
+![2 картинка](https://github.com/Lyapa96/di/blob/master/TagsCloudApp/image.png) 
