@@ -7,9 +7,7 @@ using TagsCloudApp.CloudLayouter.CircularCloudLayouter;
 using TagsCloudApp.DataInput;
 using TagsCloudApp.DeterminatorOfWordSize;
 using TagsCloudApp.Preprocessors;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
+
 
 
 namespace TagsCloudApp
@@ -20,39 +18,6 @@ namespace TagsCloudApp
 
         static void Main(string[] args)
         {
-
-            Process p = new Process();
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.FileName = "mystem.exe";
-            p.StartInfo.Arguments = "-i 1.txt";
-            p.Start();
-            string s;
-            using (var reader = new StreamReader(p.StandardOutput.BaseStream, Encoding.UTF8))
-            {
-                s = reader.ReadToEnd();
-            }
-            p.WaitForExit();
-            ////Process mystem = new Process();
-
-            ////mystem.StartInfo.FileName = "mystem.exe";
-            ////mystem.StartInfo.Arguments = "-i 1.txt";
-            ////mystem.StartInfo.UseShellExecute = false;
-            ////mystem.StartInfo.RedirectStandardInput = true;
-            ////mystem.StartInfo.RedirectStandardOutput = true;
-
-            ////String outputText = " ";
-            ////mystem.Start();
-            ////StreamWriter mystemStreamWriter = mystem.StandardInput;
-            ////StreamReader mystemStreamReader = mystem.StandardOutput;
-            ////string bs = mystemStreamReader.ReadToEnd();
-            ////mystemStreamWriter.Write(bs);
-            ////mystemStreamWriter.Close();
-            ////outputText += mystemStreamReader.ReadToEnd() + " ";
-            ////mystem.WaitForExit();
-            ////mystem.Close();
-
-
             args = new[]
             {
                 "-w", "1000",
@@ -60,13 +25,13 @@ namespace TagsCloudApp
                 "-r", "500", "500",
                 "-e", ".png",
                 "-t", "2.txt",
-                "-i", "image",
-                "-f", "Arial",
-                "-b", "white",
-                "-c", "yellow","red","blue","black",
+                "-i", "imageWithoutPrepositions",
+                "-f", "Times New Roman",
+                "-b", "black",
+                "-c", "white",
                 "-d", "ordinary",
-                "-p", "initial_form","without_boring_words",
-                "-a", "random"
+                "-p", "initial_form", "without_prepositions",
+                "-a", "similar"
             };
 
 
@@ -92,7 +57,7 @@ namespace TagsCloudApp
             RegisterIAlgorithmOfColoring(builder);
             RegisterIFilterWords(builder);
 
-            builder.RegisterType<CircularCloudLayouter>().As<ICloudLayouter>();                     
+            builder.RegisterType<CircularCloudLayouter>().As<ICloudLayouter>();
             builder.RegisterType<TagsCloudSettings>().AsSelf();
             builder.RegisterType<Preprocessor>().AsSelf();
             builder.RegisterType<ConsoleUi>().AsSelf();
@@ -100,7 +65,7 @@ namespace TagsCloudApp
             builder.RegisterType<TagsCloud>()
                 .UsingConstructor(typeof (Preprocessor), typeof (TagsCloudSettings),
                     typeof (IDeterminatorOfWordSize), typeof (ICloudLayouter));
-            
+
             Container = builder.Build();
         }
 
@@ -171,6 +136,10 @@ namespace TagsCloudApp
                     if (name == "without_boring_words")
                     {
                         return new FilterBoringWords();
+                    }
+                    if (name == "without_prepositions")
+                    {
+                        return new FilterPrepositions();
                     }
                     return null;
                 });

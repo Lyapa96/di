@@ -4,9 +4,6 @@ using System.Linq;
 using CommandLine;
 
 
-
-
-
 namespace TagsCloudApp.Client.ConsoleClient
 {
     internal class ConsoleUi : TagsCloudAppUi
@@ -14,7 +11,7 @@ namespace TagsCloudApp.Client.ConsoleClient
         public delegate ConsoleUi Factory(IEnumerable<string> args);
 
         private IEnumerable<string> args { get; set; }
-      
+
         public ConsoleUi(IEnumerable<string> args)
         {
             this.args = args;

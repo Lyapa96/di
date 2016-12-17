@@ -13,7 +13,6 @@ namespace TagsCloudApp.Client
 {
     public abstract class TagsCloudAppUi
     {
-       
         public abstract void Run();
 
         public virtual IEnumerable<string> GetSourceText(IOptions options)
@@ -54,7 +53,8 @@ namespace TagsCloudApp.Client
             var imageFormat = TagsCloudSettingsParser.GetFormat(options.ImageFormat);
             var center = TagsCloudSettingsParser.GetCenter(options.CenterPoints[0], options.CenterPoints[1]);
 
-            var algorithmOfColoring = Program.Container.Resolve<IAlgorithmOfColoring>(new NamedParameter("name", options.AlgorithmName));
+            var algorithmOfColoring =
+                Program.Container.Resolve<IAlgorithmOfColoring>(new NamedParameter("name", options.AlgorithmName));
 
             return Program.Container.Resolve<TagsCloudSettings.Factory>()
                 .Invoke(options.ImageWidth, options.ImageHeight, center, imageFormat, options.Fontname, backgroudColor,
@@ -74,7 +74,6 @@ namespace TagsCloudApp.Client
                 }
             }
             return Program.Container.Resolve<Preprocessor.Factory>().Invoke(filters);
-
         }
     }
 }

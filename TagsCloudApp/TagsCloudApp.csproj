@@ -87,6 +87,7 @@
     <Compile Include="DeterminatorOfWordSize\OneBigWordDeterminator.cs" />
     <Compile Include="DeterminatorOfWordSize\OrdinaryDeterminator.cs" />
     <Compile Include="Preprocessors\FilterBoringWords.cs" />
+    <Compile Include="Preprocessors\FilterPrepositions.cs" />
     <Compile Include="Preprocessors\IFilterWords.cs" />
     <Compile Include="Preprocessors\Preprocessor.cs" />
     <Compile Include="Preprocessors\FilterWordsInInitialForm.cs" />
