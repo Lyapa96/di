@@ -7,6 +7,10 @@ using TagsCloudApp.CloudLayouter.CircularCloudLayouter;
 using TagsCloudApp.DataInput;
 using TagsCloudApp.DeterminatorOfWordSize;
 using TagsCloudApp.Preprocessors;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+
 
 namespace TagsCloudApp
 {
@@ -16,6 +20,39 @@ namespace TagsCloudApp
 
         static void Main(string[] args)
         {
+
+            Process p = new Process();
+            p.StartInfo.UseShellExecute = false;
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = "mystem.exe";
+            p.StartInfo.Arguments = "-i 1.txt";
+            p.Start();
+            string s;
+            using (var reader = new StreamReader(p.StandardOutput.BaseStream, Encoding.UTF8))
+            {
+                s = reader.ReadToEnd();
+            }
+            p.WaitForExit();
+            ////Process mystem = new Process();
+
+            ////mystem.StartInfo.FileName = "mystem.exe";
+            ////mystem.StartInfo.Arguments = "-i 1.txt";
+            ////mystem.StartInfo.UseShellExecute = false;
+            ////mystem.StartInfo.RedirectStandardInput = true;
+            ////mystem.StartInfo.RedirectStandardOutput = true;
+
+            ////String outputText = " ";
+            ////mystem.Start();
+            ////StreamWriter mystemStreamWriter = mystem.StandardInput;
+            ////StreamReader mystemStreamReader = mystem.StandardOutput;
+            ////string bs = mystemStreamReader.ReadToEnd();
+            ////mystemStreamWriter.Write(bs);
+            ////mystemStreamWriter.Close();
+            ////outputText += mystemStreamReader.ReadToEnd() + " ";
+            ////mystem.WaitForExit();
+            ////mystem.Close();
+
+
             args = new[]
             {
                 "-w", "1000",
@@ -101,10 +138,6 @@ namespace TagsCloudApp
                     }
                     throw new ArgumentException();
                 });
-
-            //builder.RegisterType<FreeWordTypesDeterminator>().As<IDeterminatorOfWordSize>();
-            //builder.RegisterType<OrdinaryDeterminator>().As<IDeterminatorOfWordSize>();
-            //builder.RegisterType<OneBigWordDeterminator>().As<IDeterminatorOfWordSize>();
         }
 
         private static void RegisterIAlgorithmOfColoring(ContainerBuilder builder)

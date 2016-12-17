@@ -11,9 +11,9 @@ namespace TagsCloudApp.DataInput
     {
         public IEnumerable<string> GetFileText(string filename)
         {
-            string docPath = GetPathToDoc(filename);
-            Application app = new Application();
-            Document doc = app.Documents.Open(docPath);
+            var docPath = GetPathToDoc(filename);
+            var app = new Application();
+            var doc = app.Documents.Open(docPath);
 
             var allWords = doc.Content.Text.Split(new string[] {"\r\n"}, StringSplitOptions.RemoveEmptyEntries);
             doc.Close();

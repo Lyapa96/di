@@ -60,6 +60,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -72,7 +73,8 @@
     <Compile Include="AlgorithmOfColoring\RandomColoring.cs" />
     <Compile Include="AlgorithmOfColoring\SimilarColoring.cs" />
     <Compile Include="Client\ConsoleClient\ConsoleUi.cs" />
-    <Compile Include="Client\ConsoleClient\Options.cs" />
+    <Compile Include="Client\ConsoleClient\ConsoleOptions.cs" />
+    <Compile Include="Client\IOptions.cs" />
     <Compile Include="CloudLayouter\CircularCloudLayouter\CircularCloudLayouter.cs" />
     <Compile Include="CloudLayouter\CircularCloudLayouter\GeometryHelper.cs" />
     <Compile Include="CloudLayouter\CircularCloudLayouter\Spiral.cs" />

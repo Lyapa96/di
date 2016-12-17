@@ -3,7 +3,7 @@ using CommandLine.Text;
 
 namespace TagsCloudApp.Client.ConsoleClient
 {
-    internal class Options
+    internal class ConsoleOptions : IOptions
     {
         [Option('w', "image_width", DefaultValue = 500, HelpText = "Width of resulting image with tags cloud")]
         public int ImageWidth { get; set; }
@@ -18,7 +18,7 @@ namespace TagsCloudApp.Client.ConsoleClient
         public string ImageFormat { get; set; }
 
         [Option('t', "filename", HelpText = "Set source filename", Required = true)]
-        public string TextInputFile { get; set; }
+        public string Filename { get; set; }
 
         [Option('i', "image_name", HelpText = "Set image name", Required = true)]
         public string ImageOutputFile { get; set; }
