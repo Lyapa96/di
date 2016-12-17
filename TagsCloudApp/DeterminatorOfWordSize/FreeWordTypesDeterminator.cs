@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace TagsCloudApp.DeterminatorOfWordSize
 {
-    public class FirstDeterminator : IDeterminatorOfWordSize
+    public class FreeWordTypesDeterminator : IDeterminatorOfWordSize
     {
         private const int BigSize = 30;
         private const int MediumSize = 20;

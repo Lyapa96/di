@@ -10,15 +10,15 @@ namespace TagsCloudApp
 {
     public class TagsCloud
     {
-        public delegate TagsCloud Factory(IPreprocessorWords preprocessor, TagsCloudSettings settings,
+        public delegate TagsCloud Factory(Preprocessor preprocessor, TagsCloudSettings settings,
             IDeterminatorOfWordSize determinatorOfWordSize, ICloudLayouter cloudLayouter);
 
         public TagsCloudSettings Settings { get; set; }
         public ICloudLayouter CloudLayouter { get; set; }
         public IDeterminatorOfWordSize DeterminatorOfWordSize { get; set; }
-        public IPreprocessorWords Preprocessor { get; set; }
+        public Preprocessor Preprocessor { get; set; }
 
-        public TagsCloud(IPreprocessorWords preprocessor, TagsCloudSettings settings,
+        public TagsCloud(Preprocessor preprocessor, TagsCloudSettings settings,
             IDeterminatorOfWordSize determinatorOfWordSize, ICloudLayouter cloudLayouter)
         {
             Preprocessor = preprocessor;
@@ -49,7 +49,7 @@ namespace TagsCloudApp
                 var rectangle = CloudLayouter.LastPlacedRectangle;
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
                 g.DrawString(wordInformation.Content, font,
-                    new SolidBrush(Settings.AlgorithmOfColoringWords(wordInformation)), rectangle);
+                    new SolidBrush(Settings.AlgorithmOfColoringWords.GetColor(wordInformation,Settings.Colors)), rectangle);
             }
 
             CloudLayouter.RemovePlacedRectangles();

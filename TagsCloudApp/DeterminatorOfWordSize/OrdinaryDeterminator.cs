@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace TagsCloudApp.DeterminatorOfWordSize
 {
-    public class SecondDeterminator : IDeterminatorOfWordSize
+    public class OrdinaryDeterminator : IDeterminatorOfWordSize
     {
         private const int MinFontSize = 8;
         private const int MaxFontSize = 80;

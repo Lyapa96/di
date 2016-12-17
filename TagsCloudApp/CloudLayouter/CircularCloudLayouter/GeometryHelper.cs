@@ -34,7 +34,6 @@ namespace TagsCloudVisualization
 
         public static bool IsRectanglesIntersect(Rectangle r1, Rectangle r2)
         {
-            //return r1.IntersectsWith(r2);
             var intersection = Rectangle.Intersect(r1, r2);
             return !(intersection.Width == 0 && intersection.Height == 0);
         }

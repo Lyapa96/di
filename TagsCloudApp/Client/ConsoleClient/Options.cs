@@ -34,12 +34,14 @@ namespace TagsCloudApp.Client.ConsoleClient
             HelpText = "Сolors of words in the text")]
         public string[] TextColors { get; set; }
 
-
         [Option('d', "determinator", HelpText = "Set determinator of wordsize first or second")]
-        public string nameDeterminatorOfWordSize { get; set; }
+        public string NameDeterminatorOfWordSize { get; set; }
 
-        [Option('p', "preprocessor", HelpText = "Set preprocessor of wordsize first or second")]
-        public string namePreprocessor { get; set; }
+        [OptionArray('p', "filter", HelpText = "Set filter of wordsize first or second")]
+        public string[] FiltersNames { get; set; }
+
+        [Option('a', "algorithm of coloring", HelpText = "Algorithm of coloring")]
+        public string AlgorithmName { get; set; }
 
         [HelpOption]
         public string GetUsage()

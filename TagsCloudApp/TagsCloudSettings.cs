@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using TagsCloudApp.AlgorithmOfColoring;
 
 namespace TagsCloudApp
 {
@@ -9,7 +10,7 @@ namespace TagsCloudApp
     {
         public delegate TagsCloudSettings Factory(
             int width, int height,Point center ,ImageFormat imageFormat, string fontname, Color backgroundColor,
-            IEnumerable<Color> colors, Func<WordInformation, Color> algorithmOfColoringWords);
+            IEnumerable<Color> colors, IAlgorithmOfColoring algorithmOfColoring);
 
         public int Width { get; set; }
         public int Height { get; set; }
@@ -18,11 +19,11 @@ namespace TagsCloudApp
         public string Fontname { get; set; }
         public Color BackgroundColor { get; set; }
         public IEnumerable<Color> Colors { get; set; }
-        public Func<WordInformation, Color> AlgorithmOfColoringWords { get; set; }
+        public IAlgorithmOfColoring AlgorithmOfColoringWords { get; set; }
         
 
         public TagsCloudSettings(int width, int height,Point center, ImageFormat imageFormat, string fontname, Color backgroundColor,
-            IEnumerable<Color> colors, Func<WordInformation, Color> algorithmOfColoringWords)
+            IEnumerable<Color> colors, IAlgorithmOfColoring algorithmOfColoring)
         {
             Width = width;
             Height = height;
@@ -31,7 +32,7 @@ namespace TagsCloudApp
             CenterPoint = center;
             BackgroundColor = backgroundColor;
             Colors = colors;
-            AlgorithmOfColoringWords = algorithmOfColoringWords;
+            AlgorithmOfColoringWords = algorithmOfColoring;
         }
     }
 }

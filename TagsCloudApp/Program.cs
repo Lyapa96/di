@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using TagsCloudApp.AlgorithmOfColoring;
 using TagsCloudApp.Client.ConsoleClient;
 using TagsCloudApp.CloudLayouter;
 using TagsCloudApp.CloudLayouter.CircularCloudLayouter;
@@ -21,13 +22,14 @@ namespace TagsCloudApp
                 "-h", "1000",
                 "-r", "500", "500",
                 "-e", ".png",
-                "-t", "1.txt",
+                "-t", "2.txt",
                 "-i", "image",
                 "-f", "Arial",
                 "-b", "white",
-                "-c", "red",
-                "-d", "first",
-                "-p", "first"
+                "-c", "yellow","red","blue","black",
+                "-d", "ordinary",
+                "-p", "initial_form","without_boring_words",
+                "-a", "random"
             };
 
 
@@ -47,58 +49,98 @@ namespace TagsCloudApp
         private static void CreateContainer()
         {
             var builder = new ContainerBuilder();
+
+            RegisterIFileParser(builder);
+            RegisterIDeterminatorOfWordSize(builder);
+            RegisterIAlgorithmOfColoring(builder);
+            RegisterIFilterWords(builder);
+
+            builder.RegisterType<CircularCloudLayouter>().As<ICloudLayouter>();                     
+            builder.RegisterType<TagsCloudSettings>().AsSelf();
+            builder.RegisterType<Preprocessor>().AsSelf();
+            builder.RegisterType<ConsoleUi>().AsSelf();
+
+            builder.RegisterType<TagsCloud>()
+                .UsingConstructor(typeof (Preprocessor), typeof (TagsCloudSettings),
+                    typeof (IDeterminatorOfWordSize), typeof (ICloudLayouter));
+            
+            Container = builder.Build();
+        }
+
+        private static void RegisterIFileParser(ContainerBuilder builder)
+        {
             builder.Register<IFileParser>(
                 (c, p) =>
                 {
                     var extension = p.Named<string>("extension");
                     if (extension == ".txt")
                         return new TxtParser();
+                    if (extension == ".doc")
+                        return new DocParser();
                     throw new ArgumentException();
                 });
+        }
+
+        private static void RegisterIDeterminatorOfWordSize(ContainerBuilder builder)
+        {
             builder.Register<IDeterminatorOfWordSize>(
                 (c, p) =>
                 {
                     var name = p.Named<string>("name");
-                    if (name == "first")
+                    if (name == "free_word_types")
                     {
-                        return new FirstDeterminator();
+                        return new FreeWordTypesDeterminator();
                     }
-                    if (name == "second")
+                    if (name == "ordinary")
                     {
-                        return new SecondDeterminator();
+                        return new OrdinaryDeterminator();
+                    }
+                    if (name == "one_big_word")
+                    {
+                        return new OneBigWordDeterminator();
                     }
                     throw new ArgumentException();
                 });
-            builder.Register<IPreprocessorWords>(
+
+            //builder.RegisterType<FreeWordTypesDeterminator>().As<IDeterminatorOfWordSize>();
+            //builder.RegisterType<OrdinaryDeterminator>().As<IDeterminatorOfWordSize>();
+            //builder.RegisterType<OneBigWordDeterminator>().As<IDeterminatorOfWordSize>();
+        }
+
+        private static void RegisterIAlgorithmOfColoring(ContainerBuilder builder)
+        {
+            builder.Register<IAlgorithmOfColoring>(
                 (c, p) =>
                 {
                     var name = p.Named<string>("name");
-                    if (name == "first")
+                    if (name == "random")
                     {
-                        return new OrdinaryPreprocessor();
+                        return new RandomColoring();
                     }
-                    if (name == "second")
+                    if (name == "similar")
                     {
-                        return new PreprocessorWordsInInitialForm();
+                        return new SimilarColoring();
                     }
                     throw new ArgumentException();
                 });
+        }
 
-            builder.RegisterType<FirstDeterminator>().As<IDeterminatorOfWordSize>();
-            builder.RegisterType<SecondDeterminator>().As<IDeterminatorOfWordSize>();
-            builder.RegisterType<CircularCloudLayouter>().As<ICloudLayouter>();
-            builder.RegisterType<PreprocessorWordsInInitialForm>().As<IPreprocessorWords>();
-            builder.RegisterType<OrdinaryPreprocessor>().As<IPreprocessorWords>();
-            builder.RegisterType<TagsCloudSettings>().AsSelf();
-
-
-            builder.RegisterType<TagsCloud>()
-                .UsingConstructor(typeof (IPreprocessorWords), typeof (TagsCloudSettings),
-                    typeof (IDeterminatorOfWordSize), typeof (ICloudLayouter));
-
-            builder.RegisterType<ConsoleUi>().AsSelf();
-
-            Container = builder.Build();
+        private static void RegisterIFilterWords(ContainerBuilder builder)
+        {
+            builder.Register<IFilterWords>(
+                (c, p) =>
+                {
+                    var name = p.Named<string>("name");
+                    if (name == "initial_form")
+                    {
+                        return new FilterWordsInInitialForm();
+                    }
+                    if (name == "without_boring_words")
+                    {
+                        return new FilterBoringWords();
+                    }
+                    return null;
+                });
         }
     }
 }
