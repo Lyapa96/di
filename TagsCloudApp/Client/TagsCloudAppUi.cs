@@ -15,28 +15,32 @@ namespace TagsCloudApp.Client
     {
         public abstract void Run();
 
-        public virtual IEnumerable<string> GetSourceText(IOptions options)
+        public virtual Result<IEnumerable<string>> GetSourceText(IOptions options)
         {
-            var extension = Path.GetExtension(options.Filename);
-            var fileParser = Program.Container.Resolve<IFileParser>(new NamedParameter("extension", extension));
-            return fileParser.GetFileText(options.Filename);
+            //var extension = Path.GetExtension(options.Filename);
+            //var fileParser = Program.Container.Resolve<IFileParser>(new NamedParameter("extension", extension));
+            //return fileParser.GetFileText(options.Filename);
+
+            var text = Result.Of(() => Path.GetExtension(options.Filename),"Неверный формат входного файла")
+                .ThenTry(GetFileParser,"Невозможно получить информацию из данного формата")
+                .ThenTry(parser => parser.GetFileText(options.Filename),"Не удалось получить текст из файла");
+            return text;
         }
+
+
 
         public virtual void SaveCloud(IOptions options)
         {
-            var settings = GetTagsCloudSettings(options);
-            var layouter = Program.Container.Resolve<ICloudLayouter>();
-            var determinator =
-                Program.Container.Resolve<IDeterminatorOfWordSize>(new NamedParameter("name",
-                    options.NameDeterminatorOfWordSize));
-            var preprocessor = GetPreprocessor(options);
+            var settings = Result.Of(() => GetTagsCloudSettings(options),"Не удалось получить настройки");
+            var layouter = Result.Of(() => Program.Container.Resolve<ICloudLayouter>(), "Не опеределен раскладчик облака");
+            var determinator = Result.Of(() => GetDeterminatorOfWordSize(options),"Не установлен определитель размера слов");
+            var preprocessor = Result.Of(() => GetPreprocessor(options),"Не удалось установить препроцессор");
 
-            var cloud = Program.Container.Resolve<TagsCloud.Factory>()
-                .Invoke(preprocessor, settings, determinator, layouter);
+            var cloud = GetCloud(preprocessor, settings, determinator, layouter);
 
             var text = GetSourceText(options);
-
-            cloud.CreateBitmapWithWords(text, GetPathToImg(options));
+            var path = GetPathToImg(options);
+            cloud.GetValueOrThrow().CreateBitmapWithWords(text.GetValueOrThrow(),path);
         }
 
         private string GetPathToImg(IOptions options)
@@ -74,6 +78,23 @@ namespace TagsCloudApp.Client
                 }
             }
             return Program.Container.Resolve<Preprocessor.Factory>().Invoke(filters);
+        }
+
+        private IFileParser GetFileParser(string extension)
+        {
+            return Program.Container.Resolve<IFileParser>(new NamedParameter("extension", extension));
+        }
+
+        private Result<TagsCloud> GetCloud(Result<Preprocessor> preprocessor, Result<TagsCloudSettings> settings, Result<IDeterminatorOfWordSize> determinator, Result<ICloudLayouter> layouter)
+        {
+            return Program.Container.Resolve<TagsCloud.Factory>()
+                .Invoke(preprocessor.GetValueOrThrow(), settings.GetValueOrThrow(), determinator.GetValueOrThrow(), layouter.GetValueOrThrow());
+        }
+
+        private IDeterminatorOfWordSize GetDeterminatorOfWordSize(IOptions options)
+        {
+            return Program.Container.Resolve<IDeterminatorOfWordSize>(new NamedParameter("name",
+                options.NameDeterminatorOfWordSize));
         }
     }
 }

@@ -37,7 +37,7 @@ namespace TagsCloudApp.Preprocessors
 
             foreach (var filter in filters)
             {
-                stats = filter.Processing(stats);
+                stats = filter.Processing(stats).GetValueOrThrow();
             }
             return stats;
         }

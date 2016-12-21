@@ -7,7 +7,13 @@ namespace TagsCloudApp.Preprocessors
 {
     public class FilterWordsInInitialForm : IFilterWords
     {
-        public Dictionary<string, int> Processing(Dictionary<string, int> stats)
+        public Result<Dictionary<string, int>> Processing(Dictionary<string, int> stats)
+        {
+            var res = Result.Of(() => GetNewStats(stats),"одна из внешних библиотек дала сбой(NHunspell не смог найти свои словари)");
+            return res;
+        }
+
+        private static Dictionary<string, int> GetNewStats(Dictionary<string, int> stats)
         {
             var newStats = new Dictionary<string, int>();
             using (Hunspell hunspell = new Hunspell("ru_RU.aff", "ru_RU.dic"))

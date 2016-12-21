@@ -39,8 +39,8 @@ namespace TagsCloudApp
             g.Clear(Settings.BackgroundColor);
             foreach (var wordInformation in words)
             {
-                var font = DeterminatorOfWordSize.GetFont(wordInformation, Settings.Fontname);
-                var size = g.MeasureString(wordInformation.Content, font);
+                var font = Result.Of(()=>DeterminatorOfWordSize.GetFont(wordInformation, Settings.Fontname), "Шрифт с таким именем не найден в системе");
+                var size = g.MeasureString(wordInformation.Content, font.GetValueOrThrow());
                 var bigSize = new Size((int)Math.Ceiling(size.Width),(int)Math.Ceiling(size.Height));
                 if (!CloudLayouter.TryPutNextRectangle(bigSize))
                 {
@@ -48,7 +48,7 @@ namespace TagsCloudApp
                 }
                 var rectangle = CloudLayouter.LastPlacedRectangle;
                 g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-                g.DrawString(wordInformation.Content, font,
+                g.DrawString(wordInformation.Content, font.GetValueOrThrow(),
                     new SolidBrush(Settings.AlgorithmOfColoringWords.GetColor(wordInformation,Settings.Colors)), rectangle);
             }
 

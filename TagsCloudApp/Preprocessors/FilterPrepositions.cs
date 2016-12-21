@@ -13,7 +13,7 @@ namespace TagsCloudApp.Preprocessors
         private string nameTempFile = "temp.txt";
         private string mystem = "mystem.exe";
 
-        public Dictionary<string, int> Processing(Dictionary<string, int> stats)
+        public Result<Dictionary<string, int>> Processing(Dictionary<string, int> stats)
         {
             CreateTempFile(stats);
             var newText = GetTextWithInformation();

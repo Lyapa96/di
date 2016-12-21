@@ -4,6 +4,6 @@ namespace TagsCloudApp.Preprocessors
 {
     public interface IFilterWords
     {
-        Dictionary<string, int> Processing(Dictionary<string, int> stats);
+       Result<Dictionary<string, int>> Processing(Dictionary<string, int> stats);
     }
 }
