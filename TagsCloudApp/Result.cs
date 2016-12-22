@@ -12,6 +12,7 @@ namespace TagsCloudApp
 
     public struct Result<T>
     {
+
         public Result(string error, T value = default(T))
         {
             Error = error;
@@ -28,7 +29,8 @@ namespace TagsCloudApp
         public T GetValueOrThrow()
         {
             if (IsSuccess) return Value;
-            throw new InvalidOperationException($"No value. Only Error {Error}");
+            Console.WriteLine(Error);
+            throw new InvalidOperationException($"No value. Only Error {Error}");          
         }
 
         public bool IsSuccess => Error == null;

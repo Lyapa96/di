@@ -22,19 +22,19 @@ namespace TagsCloudApp
             {"yellow", Color.Yellow},
         };
 
-        public static ImageFormat GetFormat(string formatName)
+        public static Result<ImageFormat> GetFormat(string formatName)
         {
-            return formats[formatName];
+            return Result.Of(()=>formats[formatName],$"{formatName} - данный формат изображения не пожддерживается");
         }
 
-        public static Color GetColor(string colorName)
+        public static Result<Color> GetColor(string colorName)
         {
-            return stringToColors[colorName];
+            return Result.Of(() => stringToColors[colorName], $"{colorName} - данный цвет не поддерживается");
         }
 
-        public static IEnumerable<Color> GetColors(IEnumerable<string> colorNames)
+        public static IEnumerable<Result<Color>> GetColors(IEnumerable<string> colorNames)
         {
-            return colorNames.Select(x => stringToColors[x]).ToArray();
+            return colorNames.Select(GetColor).ToArray();
         }
 
         public static Point GetCenter(int x, int y)

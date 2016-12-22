@@ -31,7 +31,7 @@ namespace TagsCloudApp
                 "-c", "white",
                 "-d", "ordinary",
                 "-p", "initial_form", "without_prepositions",
-                "-a", "similar"
+                "-a", "random"
             };
 
 

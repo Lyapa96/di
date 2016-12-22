@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using TagsCloudApp.AlgorithmOfColoring;
 
 namespace TagsCloudApp
@@ -9,8 +10,8 @@ namespace TagsCloudApp
     public class TagsCloudSettings
     {
         public delegate TagsCloudSettings Factory(
-            int width, int height,Point center ,ImageFormat imageFormat, string fontname, Color backgroundColor,
-            IEnumerable<Color> colors, IAlgorithmOfColoring algorithmOfColoring);
+            int width, int height,Point center ,Result<ImageFormat> imageFormat, string fontname, Result<Color> backgroundColor,
+            IEnumerable<Result<Color>> colors, IAlgorithmOfColoring algorithmOfColoring);
 
         public int Width { get; set; }
         public int Height { get; set; }
@@ -22,16 +23,16 @@ namespace TagsCloudApp
         public IAlgorithmOfColoring AlgorithmOfColoringWords { get; set; }
         
 
-        public TagsCloudSettings(int width, int height,Point center, ImageFormat imageFormat, string fontname, Color backgroundColor,
-            IEnumerable<Color> colors, IAlgorithmOfColoring algorithmOfColoring)
+        public TagsCloudSettings(int width, int height,Point center, Result<ImageFormat> imageFormat, string fontname, Result<Color> backgroundColor,
+            IEnumerable<Result<Color>> colors, IAlgorithmOfColoring algorithmOfColoring)
         {
             Width = width;
             Height = height;
-            ImageFormat = imageFormat;
+            ImageFormat = imageFormat.GetValueOrThrow();
             Fontname = fontname;
             CenterPoint = center;
-            BackgroundColor = backgroundColor;
-            Colors = colors;
+            BackgroundColor = backgroundColor.GetValueOrThrow();
+            Colors = colors.Select(c => c.GetValueOrThrow());
             AlgorithmOfColoringWords = algorithmOfColoring;
         }
     }

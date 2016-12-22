@@ -16,7 +16,7 @@ namespace TagsCloudApp.Preprocessors
         public Result<Dictionary<string, int>> Processing(Dictionary<string, int> stats)
         {
             CreateTempFile(stats);
-            var newText = GetTextWithInformation();
+            var newText = Result.Of(GetTextWithInformation,"Нет доступа к mystem.exe").GetValueOrThrow();
 
             var words = newText.Split(new [] {"}"}, StringSplitOptions.RemoveEmptyEntries)
                 .Where(wordWithInformation => !wordWithInformation.Contains(transcriptOfPreposition))
