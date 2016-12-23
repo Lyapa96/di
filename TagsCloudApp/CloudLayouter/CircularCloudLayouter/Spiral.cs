@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using TagsCloudApp;
 
 
 namespace TagsCloudVisualization
@@ -27,9 +28,10 @@ namespace TagsCloudVisualization
             MaxRadius = GeometryHelper.GetMaxRadius(center, width, height);
         }
 
-        public Point GetNextPoint()
+        public Result<Point> GetNextPoint()
         {
-            if (CurrentRadius > MaxRadius) throw new IndexOutOfRangeException();
+            
+            if (CurrentRadius > MaxRadius) return Result.Fail<Point>("Следующая точка в спирале превышает макимальный радиус");
             currentAngle += deltaInDegrees;
             currentDensityOfSpiral += deltaFromDensity;
             CurrentRadius = currentAngle*currentDensityOfSpiral;

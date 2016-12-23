@@ -31,20 +31,14 @@ namespace TagsCloudApp
                 "-c", "white",
                 "-d", "ordinary",
                 "-p", "initial_form", "without_prepositions",
-                "-a", "random"
+                "-a", "random",
+                "-m","100"
             };
 
 
             CreateContainer();
-
-            try
-            {
-                Container.Resolve<ConsoleUi.Factory>().Invoke(args).Run();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.StackTrace);
-            }
+            Container.Resolve<ConsoleUi.Factory>().Invoke(args).Run();
+          
         }
 
 
@@ -71,7 +65,7 @@ namespace TagsCloudApp
 
         private static void RegisterIFileParser(ContainerBuilder builder)
         {
-            builder.Register<IFileParser>(
+            builder.Register<Result<IFileParser>>(
                 (c, p) =>
                 {
                     var extension = p.Named<string>("extension");
@@ -79,13 +73,13 @@ namespace TagsCloudApp
                         return new TxtParser();
                     if (extension == ".doc")
                         return new DocParser();
-                    throw new ArgumentException();
+                    return Result.Fail<IFileParser>("Не удается обработать данный формат текста");
                 });
         }
 
         private static void RegisterIDeterminatorOfWordSize(ContainerBuilder builder)
         {
-            builder.Register<IDeterminatorOfWordSize>(
+            builder.Register<Result<IDeterminatorOfWordSize>>(
                 (c, p) =>
                 {
                     var name = p.Named<string>("name");
@@ -101,13 +95,13 @@ namespace TagsCloudApp
                     {
                         return new OneBigWordDeterminator();
                     }
-                    throw new ArgumentException();
+                    return Result.Fail<IDeterminatorOfWordSize>("Не установлен определитель размера слов");
                 });
         }
 
         private static void RegisterIAlgorithmOfColoring(ContainerBuilder builder)
         {
-            builder.Register<IAlgorithmOfColoring>(
+            builder.Register<Result<IAlgorithmOfColoring>>(
                 (c, p) =>
                 {
                     var name = p.Named<string>("name");
@@ -119,13 +113,13 @@ namespace TagsCloudApp
                     {
                         return new SimilarColoring();
                     }
-                    throw new ArgumentException();
+                    return Result.Fail<IAlgorithmOfColoring>($"Алгоритма расскарски с таким именем не существует({name})");
                 });
         }
 
         private static void RegisterIFilterWords(ContainerBuilder builder)
         {
-            builder.Register<IFilterWords>(
+            builder.Register<Result<IFilterWords>>(
                 (c, p) =>
                 {
                     var name = p.Named<string>("name");
@@ -141,7 +135,7 @@ namespace TagsCloudApp
                     {
                         return new FilterPrepositions();
                     }
-                    return null;
+                    return Result.Fail<IFilterWords>($"Данного фильтра не существует({name})");
                 });
         }
     }

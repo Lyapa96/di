@@ -43,6 +43,9 @@ namespace TagsCloudApp.Client.ConsoleClient
         [Option('a', "algorithm of coloring", HelpText = "Algorithm of coloring")]
         public string AlgorithmName { get; set; }
 
+        [Option('m',  HelpText = "Maximum count words")]
+        public int MaxCountWords { get; set; }
+
         [HelpOption]
         public string GetUsage()
         {

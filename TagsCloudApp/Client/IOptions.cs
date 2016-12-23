@@ -14,5 +14,6 @@
         string NameDeterminatorOfWordSize { get; set; }
         string[] FiltersNames { get; set; }
         string AlgorithmName { get; set; }
+        int MaxCountWords { get; set; }
     }
 }

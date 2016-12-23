@@ -27,11 +27,10 @@ namespace TagsCloudApp.CloudLayouter.CircularCloudLayouter
             this.deltaOfSpiralInDegrees = deltaOfSpiralInDegrees;
         }
 
-        public bool TryPutNextRectangle(Size rectangleSize)
+        public Result<bool> TryPutNextRectangle(Size rectangleSize)
         {
-            try
-            {
-                if (rectangleSize.Width > Width || rectangleSize.Height > Height) throw new ArgumentException();
+                if (rectangleSize.Width > Width || rectangleSize.Height > Height)
+                    Result.Fail<bool>("Размер прямоугольника больше размера облака");
                 if (Rectangles.Count == 0)
                 {
                     var rectangleCenter = new Point(rectangleSize.Width/2, rectangleSize.Height/2);
@@ -44,7 +43,7 @@ namespace TagsCloudApp.CloudLayouter.CircularCloudLayouter
                 }
                 while (true)
                 {
-                    var nextPoint = Spiral.GetNextPoint();
+                    var nextPoint =  Spiral.GetNextPoint().ReplaceError(e =>"Не удалось разместить прямоугольник").GetValueOrThrow();
                     if (GeometryHelper.IsIncorrectPoint(nextPoint, Width, Height))
                     {
                         continue;
@@ -57,11 +56,6 @@ namespace TagsCloudApp.CloudLayouter.CircularCloudLayouter
                         return true;
                     }
                 }
-            }
-            catch
-            {
-                return false;
-            }
         }
 
         public bool IsRectangleDoesNotIntersectsWithRectanglesFromCloud(Rectangle currentRectangle)
@@ -85,8 +79,7 @@ namespace TagsCloudApp.CloudLayouter.CircularCloudLayouter
         public void SetCloudSetting(int width, int height, Point centerPoint)
         {
             Width = width;
-            Height = height;
-            if (GeometryHelper.IsIncorrectPoint(centerPoint, Width, Height)) throw new ArgumentException();
+            Height = height;          
             CenterPoint = centerPoint;
             Spiral = new Spiral(CenterPoint, Width, Height, densityOfSpiral, deltaOfSpiralInDegrees);
         }
