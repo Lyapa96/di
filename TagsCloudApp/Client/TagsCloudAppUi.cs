@@ -18,23 +18,18 @@ namespace TagsCloudApp.Client
         public virtual Result<IEnumerable<string>> GetSourceText(IOptions options)
         {
             var text = Result.Of(() => Path.GetExtension(options.Filename),"Неверный формат входного файла")
-                .Then(GetFileParser)
+                .ThenTry(GetFileParser, "Невозможно получить информацию из данного формата")
                 .ThenTry(parser => parser.GetFileText(options.Filename),"Не удалось получить текст из файла");
             return text;
         }
 
         public virtual void SaveCloud(IOptions options)
         {
-            var settings = GetTagsCloudSettings(options);
-            var layouter = GetLayouter();
-            var determinator = GetDeterminatorOfWordSize(options);
-            var preprocessor = GetPreprocessor(options);
-
-            var cloud = GetCloud(preprocessor, settings, determinator, layouter);
+            var cloud = Program.Container.Resolve<TagsCloud>();
 
             var text = GetSourceText(options);
-            var path = GetPathToImg(options);
-            cloud.GetValueOrThrow().CreateBitmapWithWords(text.GetValueOrThrow(),path);
+
+            cloud.CreateBitmapWithWords(text.GetValueOrThrow(), GetPathToImg(options));
         }
 
        
@@ -63,7 +58,7 @@ namespace TagsCloudApp.Client
 
         private Result<IAlgorithmOfColoring> GetAlgorithmOfColoring(IOptions options)
         {
-            return Program.Container.Resolve<Result<IAlgorithmOfColoring>>(new NamedParameter("name", options.AlgorithmName));
+            return Result.Of(() => Program.Container.Resolve<IAlgorithmOfColoring>(new NamedParameter("name", options.AlgorithmName)), $"Алгоритма расскарски с таким именем не существует({options.AlgorithmName})");
         }
 
         private Result<Preprocessor> GetPreprocessor(IOptions options)
@@ -73,16 +68,16 @@ namespace TagsCloudApp.Client
             {
                 foreach (var filterName in options.FiltersNames)
                 {
-                    var filter = Program.Container.Resolve<Result<IFilterWords>>(new NamedParameter("name", filterName));
+                    var filter = Result.Of(() => Program.Container.Resolve<IFilterWords>(new NamedParameter("name", filterName)), $"Данного фильтра не существует({filterName})");
                     filters.Add(filter.GetValueOrThrow());
                 }
             }
             return Program.Container.Resolve<Preprocessor.Factory>().Invoke(filters);
         }
 
-        private Result<IFileParser> GetFileParser(string extension)
+        private IFileParser GetFileParser(string extension)
         {
-            return Program.Container.Resolve<Result<IFileParser>>(new NamedParameter("extension", extension));
+            return Program.Container.Resolve<IFileParser>(new NamedParameter("extension", extension));
         }
 
         private Result<TagsCloud> GetCloud(Result<Preprocessor> preprocessor, Result<TagsCloudSettings> settings, Result<IDeterminatorOfWordSize> determinator, Result<ICloudLayouter> layouter)
@@ -98,8 +93,7 @@ namespace TagsCloudApp.Client
 
         private Result<IDeterminatorOfWordSize> GetDeterminatorOfWordSize(IOptions options)
         {
-            return Program.Container.Resolve<Result<IDeterminatorOfWordSize>>(new NamedParameter("name",
-                options.NameDeterminatorOfWordSize));
+            return Result.Of(() => Program.Container.Resolve<IDeterminatorOfWordSize>(new NamedParameter("name",options.NameDeterminatorOfWordSize)), "Не установлен определитель размера слов");
         }
     }
 }

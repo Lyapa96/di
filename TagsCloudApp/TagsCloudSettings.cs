@@ -28,8 +28,6 @@ namespace TagsCloudApp
         {
             Width = GetWidth(width).GetValueOrThrow();
             Height = GetHeight(height).GetValueOrThrow();
-            Width = width;
-            Height = height;
             ImageFormat = imageFormat.GetValueOrThrow();
             Fontname = GetFont(fontname).GetValueOrThrow();
             CenterPoint = GetCenter(Width,Height,center).GetValueOrThrow();

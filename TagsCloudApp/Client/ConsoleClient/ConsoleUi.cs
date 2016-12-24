@@ -11,21 +11,27 @@ namespace TagsCloudApp.Client.ConsoleClient
         public delegate ConsoleUi Factory(IEnumerable<string> args);
 
         private IEnumerable<string> args { get; set; }
+        public IOptions Options { get; set; }
 
         public ConsoleUi(IEnumerable<string> args)
         {
             this.args = args;
+            Options = new ConsoleOptions();
         }
 
         public override void Run()
         {
-            var consoleOptions = new ConsoleOptions();
-            if (!Parser.Default.ParseArguments(args.ToArray(), consoleOptions))
+            
+            if (!Parser.Default.ParseArguments(args.ToArray(), Options))
             {
-                Console.WriteLine("Arguments given are incorrect");
-                return;
+                Console.WriteLine("Arguments given are incorrect");                
             }
-            SaveCloud(consoleOptions);
+            
+        }
+
+        public void SaveCloud()
+        {
+            SaveCloud(Options);
         }
     }
 }

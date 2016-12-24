@@ -1,6 +1,8 @@
-﻿using System;
+﻿using System.IO;
+using System.Linq;
 using Autofac;
 using TagsCloudApp.AlgorithmOfColoring;
+using TagsCloudApp.Client;
 using TagsCloudApp.Client.ConsoleClient;
 using TagsCloudApp.CloudLayouter;
 using TagsCloudApp.CloudLayouter.CircularCloudLayouter;
@@ -35,108 +37,88 @@ namespace TagsCloudApp
                 "-m","100"
             };
 
-
-            CreateContainer();
-            Container.Resolve<ConsoleUi.Factory>().Invoke(args).Run();
-          
+            var consoleClient = new ConsoleUi(args);
+            consoleClient.Run();
+            CreateContainer(consoleClient.Options);
+            consoleClient.SaveCloud();          
         }
 
 
-        private static void CreateContainer()
+        private static void CreateContainer(IOptions options)
         {
             var builder = new ContainerBuilder();
 
-            RegisterIFileParser(builder);
-            RegisterIDeterminatorOfWordSize(builder);
-            RegisterIAlgorithmOfColoring(builder);
-            RegisterIFilterWords(builder);
+            RegisterIFileParser(builder, options);
+            RegisterIDeterminatorOfWordSize(builder, options);
+            RegisterIAlgorithmOfColoring(builder, options);
+            RegisterIFilterWords(builder, options);
+            RegisterSettings(options, builder);
 
             builder.RegisterType<CircularCloudLayouter>().As<ICloudLayouter>();
-            builder.RegisterType<TagsCloudSettings>().AsSelf();
             builder.RegisterType<Preprocessor>().AsSelf();
-            builder.RegisterType<ConsoleUi>().AsSelf();
 
             builder.RegisterType<TagsCloud>()
-                .UsingConstructor(typeof (Preprocessor), typeof (TagsCloudSettings),
-                    typeof (IDeterminatorOfWordSize), typeof (ICloudLayouter));
+                .UsingConstructor(typeof(Preprocessor), typeof(TagsCloudSettings),
+                    typeof(IDeterminatorOfWordSize), typeof(ICloudLayouter));
 
             Container = builder.Build();
         }
 
-        private static void RegisterIFileParser(ContainerBuilder builder)
+        private static void RegisterSettings(IOptions options, ContainerBuilder builder)
         {
-            builder.Register<Result<IFileParser>>(
-                (c, p) =>
-                {
-                    var extension = p.Named<string>("extension");
-                    if (extension == ".txt")
-                        return new TxtParser();
-                    if (extension == ".doc")
-                        return new DocParser();
-                    return Result.Fail<IFileParser>("Не удается обработать данный формат текста");
-                });
+            var backgroundColor = TagsCloudSettingsParser.GetColor(options.BackgroundColor);
+            var colors = TagsCloudSettingsParser.GetColors(options.TextColors).ToArray();
+            var imageFormat = TagsCloudSettingsParser.GetFormat(options.ImageFormat);
+            var center = TagsCloudSettingsParser.GetCenter(options.CenterPoints[0], options.CenterPoints[1]);
+
+
+            builder.Register(
+                c =>
+                    new TagsCloudSettings(options.ImageWidth, options.ImageHeight, center, imageFormat, options.Fontname,
+                        backgroundColor, colors
+                        , Container.Resolve<IAlgorithmOfColoring>(new NamedParameter("name", options.AlgorithmName)),options.MaxCountWords))
+                .As<TagsCloudSettings>();
         }
 
-        private static void RegisterIDeterminatorOfWordSize(ContainerBuilder builder)
+        private static void RegisterIFileParser(ContainerBuilder builder, IOptions options)
         {
-            builder.Register<Result<IDeterminatorOfWordSize>>(
-                (c, p) =>
-                {
-                    var name = p.Named<string>("name");
-                    if (name == "free_word_types")
-                    {
-                        return new FreeWordTypesDeterminator();
-                    }
-                    if (name == "ordinary")
-                    {
-                        return new OrdinaryDeterminator();
-                    }
-                    if (name == "one_big_word")
-                    {
-                        return new OneBigWordDeterminator();
-                    }
-                    return Result.Fail<IDeterminatorOfWordSize>("Не установлен определитель размера слов");
-                });
+            var extension = Path.GetExtension(options.Filename);
+
+            if (extension == ".txt")
+                builder.RegisterType<TxtParser>().AsImplementedInterfaces();
+            if (extension == ".doc")
+                builder.RegisterType<DocParser>().AsImplementedInterfaces();
         }
 
-        private static void RegisterIAlgorithmOfColoring(ContainerBuilder builder)
+        private static void RegisterIDeterminatorOfWordSize(ContainerBuilder builder, IOptions options)
         {
-            builder.Register<Result<IAlgorithmOfColoring>>(
-                (c, p) =>
-                {
-                    var name = p.Named<string>("name");
-                    if (name == "random")
-                    {
-                        return new RandomColoring();
-                    }
-                    if (name == "similar")
-                    {
-                        return new SimilarColoring();
-                    }
-                    return Result.Fail<IAlgorithmOfColoring>($"Алгоритма расскарски с таким именем не существует({name})");
-                });
+            if (options.NameDeterminatorOfWordSize == "free_word_types")
+                builder.RegisterType<FreeWordTypesDeterminator>().AsImplementedInterfaces();
+            if (options.NameDeterminatorOfWordSize == "ordinary")
+                builder.RegisterType<OrdinaryDeterminator>().AsImplementedInterfaces();
+            if (options.NameDeterminatorOfWordSize == "one_big_word")
+                builder.RegisterType<OneBigWordDeterminator>().AsImplementedInterfaces();
         }
 
-        private static void RegisterIFilterWords(ContainerBuilder builder)
+        private static void RegisterIAlgorithmOfColoring(ContainerBuilder builder, IOptions options)
         {
-            builder.Register<Result<IFilterWords>>(
-                (c, p) =>
-                {
-                    var name = p.Named<string>("name");
-                    if (name == "initial_form")
-                    {
-                        return new FilterWordsInInitialForm();
-                    }
-                    if (name == "without_boring_words")
-                    {
-                        return new FilterBoringWords();
-                    }
-                    if (name == "without_prepositions")
-                    {
-                        return new FilterPrepositions();
-                    }
-                    return Result.Fail<IFilterWords>($"Данного фильтра не существует({name})");
-                });
+            if (options.AlgorithmName == "random")
+                builder.RegisterType<RandomColoring>().AsImplementedInterfaces();
+            if (options.AlgorithmName == "similar")
+                builder.RegisterType<SimilarColoring>().AsImplementedInterfaces();
+        }
+
+        private static void RegisterIFilterWords(ContainerBuilder builder, IOptions options)
+        {
+            foreach (var name in options.FiltersNames)
+            {
+                if (name == "initial_form")
+                    builder.RegisterType<FilterWordsInInitialForm>().AsImplementedInterfaces();
+                if (name == "without_boring_words")
+                    builder.RegisterType<FilterBoringWords>().AsImplementedInterfaces();
+                if (name == "without_prepositions")
+                    builder.RegisterType<FilterPrepositions>().AsImplementedInterfaces();
+            }
         }
     }
 }
