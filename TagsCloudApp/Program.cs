@@ -11,7 +11,6 @@ using TagsCloudApp.DeterminatorOfWordSize;
 using TagsCloudApp.Preprocessors;
 
 
-
 namespace TagsCloudApp
 {
     class Program
@@ -34,13 +33,13 @@ namespace TagsCloudApp
                 "-d", "ordinary",
                 "-p", "initial_form", "without_prepositions",
                 "-a", "random",
-                "-m","100"
+                "-m", "100"
             };
 
             var consoleClient = new ConsoleUi(args);
             consoleClient.Run();
             CreateContainer(consoleClient.Options);
-            consoleClient.SaveCloud();          
+            consoleClient.SaveCloud();
         }
 
 
@@ -56,10 +55,14 @@ namespace TagsCloudApp
 
             builder.RegisterType<CircularCloudLayouter>().As<ICloudLayouter>();
             builder.RegisterType<Preprocessor>().AsSelf();
-
-            builder.RegisterType<TagsCloud>()
-                .UsingConstructor(typeof(Preprocessor), typeof(TagsCloudSettings),
-                    typeof(IDeterminatorOfWordSize), typeof(ICloudLayouter));
+                        
+            builder.Register(c => new TagsCloud(
+                Result.Of(() => Container.Resolve<Preprocessor>(), "Не удалось утсановить пердобработчики"),
+                Result.Of(() => Container.Resolve<TagsCloudSettings>(), "Неверно заданы настройки"),
+                Result.Of(() => Container.Resolve<IDeterminatorOfWordSize>(),
+                    "Не удалось утсановить определитель размера слов"),
+                Result.Of(() => Container.Resolve<ICloudLayouter>(), "Не удалось утсановить раскладчик")
+                ));
 
             Container = builder.Build();
         }
@@ -76,7 +79,8 @@ namespace TagsCloudApp
                 c =>
                     new TagsCloudSettings(options.ImageWidth, options.ImageHeight, center, imageFormat, options.Fontname,
                         backgroundColor, colors
-                        , Container.Resolve<IAlgorithmOfColoring>(new NamedParameter("name", options.AlgorithmName)),options.MaxCountWords))
+                        , Container.Resolve<IAlgorithmOfColoring>(new NamedParameter("name", options.AlgorithmName)),
+                        options.MaxCountWords))
                 .As<TagsCloudSettings>();
         }
 

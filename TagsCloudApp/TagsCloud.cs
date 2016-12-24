@@ -10,21 +10,18 @@ namespace TagsCloudApp
 {
     public class TagsCloud
     {
-        public delegate TagsCloud Factory(Preprocessor preprocessor, TagsCloudSettings settings,
-            IDeterminatorOfWordSize determinatorOfWordSize, ICloudLayouter cloudLayouter);
-
         public TagsCloudSettings Settings { get; set; }
         public ICloudLayouter CloudLayouter { get; set; }
         public IDeterminatorOfWordSize DeterminatorOfWordSize { get; set; }
         public Preprocessor Preprocessor { get; set; }
 
-        public TagsCloud(Preprocessor preprocessor, TagsCloudSettings settings,
-            IDeterminatorOfWordSize determinatorOfWordSize, ICloudLayouter cloudLayouter)
+        public TagsCloud(Result<Preprocessor> preprocessor, Result<TagsCloudSettings> settings,
+            Result<IDeterminatorOfWordSize> determinatorOfWordSize, Result<ICloudLayouter> cloudLayouter)
         {
-            Preprocessor = preprocessor;
-            Settings = settings;
-            CloudLayouter = cloudLayouter;
-            DeterminatorOfWordSize = determinatorOfWordSize;
+            Preprocessor = preprocessor.GetValueOrThrow();
+            Settings = settings.GetValueOrThrow();
+            CloudLayouter = cloudLayouter.GetValueOrThrow();
+            DeterminatorOfWordSize = determinatorOfWordSize.GetValueOrThrow();
         }
 
         public void CreateBitmapWithWords(IEnumerable<string> text, string path)
